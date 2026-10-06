@@ -28,19 +28,57 @@ connectDB();
 // Create Express app
 const app = express();
 
-// CORS
+// =========================
+// CORS CONFIGURATION
+// =========================
+
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://metro-rail-frontend-chi.vercel.app"
+];
+
 app.use(cors({
-  origin: [
-    "http://localhost:3000",
-    "https://metro-rail-frontend-chi.vercel.app"
+  origin: function (origin, callback) {
+    // Allow requests without an Origin header
+    // (e.g. server-to-server requests)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization"
   ],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 204
+}));
+
+// Explicitly handle preflight requests
+app.options(/.*/, cors({
+  origin: allowedOrigins,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization"
+  ],
+  credentials: true,
+  optionsSuccessStatus: 204
 }));
 
 // Parse JSON request body
 app.use(express.json());
 
-// API Routes
+// =========================
+// API ROUTES
+// =========================
+
 app.use("/api/admin", adminAuthRoutes);
 app.use("/api/zone", zoneRoutes);
 app.use("/api/staff", staffRoutes);
@@ -56,12 +94,18 @@ app.use("/api/ticket", ticketPdfRoutes);
 app.use("/api/transactions", transactionRoutes);
 app.use("/api/tickets", TicketRoutes);
 
-// Root route
+// =========================
+// ROOT ROUTE
+// =========================
+
 app.get("/", (req, res) => {
   res.send("Metro Rail API is running");
 });
 
-// Start server
+// =========================
+// START SERVER
+// =========================
+
 const PORT = process.env.PORT || 8000;
 
 app.listen(PORT, () => {
