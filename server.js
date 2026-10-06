@@ -34,7 +34,8 @@ const app = express();
 
 const allowedOrigins = [
   "http://localhost:3000",
-  "https://metro-rail-frontend-chi.vercel.app"
+  "https://metro-rail-frontend-chi.vercel.app",
+  "https://metro-rail-frontend-36166s549-talha-development.vercel.app"
 ];
 
 app.use(cors({
